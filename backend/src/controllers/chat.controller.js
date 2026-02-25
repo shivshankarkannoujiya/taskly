@@ -27,10 +27,14 @@ const chatWithAgent = async (req, res) => {
         res.write(`data: ${JSON.stringify(event)}\n\n`);
     };
 
-    let closed = false;
-    req.on('close', () => {
-        closed = true;
+    const cleanup = () => {
         clearInterval(keepAlive);
+    };
+
+    let closed = false;
+    res.on('close', () => {
+        closed = true;
+        cleanup();
         console.log('Client disconnected');
     });
 
@@ -42,6 +46,7 @@ const chatWithAgent = async (req, res) => {
         if (!closed) {
             sendEvent({ type: 'history', data: updatedHistory });
             sendEvent({ type: 'done' });
+            cleanup();
             res.end();
         }
     } catch (error) {
@@ -55,6 +60,7 @@ const chatWithAgent = async (req, res) => {
                 },
             });
             sendEvent({ type: 'done' });
+            cleanup();
             res.end();
         }
     }
@@ -65,7 +71,7 @@ const getTodos = async (_, res) => {
         const todos = await getAllTodos();
         return res.status(200).json({ success: true, todos });
     } catch (error) {
-        console.error('Todos Error', err);
+        console.error('Todos Error', error);
         res.status(500).json({ error: 'Failed to fetch todos.' });
     }
 };
