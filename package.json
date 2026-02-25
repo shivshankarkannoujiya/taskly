@@ -6,7 +6,8 @@
     "type": "module",
     "scripts": {
         "generate": "drizzle-kit generate",
-        "migrate": "drizzle-kit migrate"
+        "migrate": "drizzle-kit migrate",
+        "studio": "drizzle-kit studio"
     },
     "keywords": [],
     "author": "",
