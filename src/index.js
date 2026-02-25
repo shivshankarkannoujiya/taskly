@@ -1,6 +1,4 @@
-import { db } from './db/index.js';
-import { todosTable } from './db/schema.js';
-import { ilike, eq } from 'drizzle-orm';
+
 import { SYSTEM_PROMPT } from './system_prompt.js';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
@@ -12,36 +10,7 @@ const AI = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-const getAllTodos = async () => {
-    const todos = await db.select().from(todosTable);
-    return todos;
-};
 
-const createTodo = async (todo) => {
-    const [result] = await db
-        .insert(todosTable)
-        .values({
-            todo,
-        })
-        .returning({
-            id: todosTable.id,
-        });
-    return result.id;
-};
-
-const searchTodo = async (search) => {
-    const query = search?.trim();
-    if (!query) return [];
-
-    return await db
-        .select()
-        .from(todosTable)
-        .where(ilike(todosTable.todo, `%${query}%`));
-};
-
-const deleteTodoById = async (id) => {
-    await db.delete(todosTable).where(eq(todosTable.id, id));
-};
 
 const tools = {
     getAllTodos,
